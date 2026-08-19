@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Earn Verse</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F0FBFF;
+  --surface:#FFFFFF;
+  --border:#C2EAF8;
+  --border2:#B8F0D8;
+  --cyan:#00B4D8;
+  --cyan2:#0096C7;
+  --cyan3:#90E0EF;
+  --cyan-bg:rgba(0,180,216,0.09);
+  --cyan-glow:rgba(0,180,216,0.22);
+  --orange:#FF6B2B;
+  --orange2:#FF8C55;
+  --orange-bg:rgba(255,107,43,0.10);
+  --green:#00C873;
+  --green2:#00E88A;
+  --green-bg:rgba(0,200,115,0.10);
+  --red:#FF4757;
+  --text:#0A2A35;
+  --text2:#1B4F60;
+  --muted:#4A7A8A;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;padding-bottom:80px;}
+
+body::before{content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 65% 50% at 10% 0%,rgba(0,180,216,0.13),transparent 60%),
+    radial-gradient(ellipse 55% 45% at 90% 100%,rgba(0,200,115,0.10),transparent 60%),
+    radial-gradient(ellipse 45% 40% at 80% 15%,rgba(255,107,43,0.07),transparent 55%);
+  pointer-events:none;z-index:0;}
+
+/* HEADER */
+.header{position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,0.90);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1.5px solid var(--border);
+  padding:11px 16px;display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 2px 16px rgba(0,180,216,0.10);}
+.header-left{display:flex;align-items:center;gap:8px;}
+.header-logo{width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--cyan),var(--orange));
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  box-shadow:0 3px 10px rgba(0,180,216,0.25);}
+.header-title{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;
+  background:linear-gradient(120deg,var(--cyan2),var(--orange));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:.4px;}
+.coin-chip{background:linear-gradient(135deg,rgba(0,180,216,0.12),rgba(255,107,43,0.08));
+  border:1.5px solid var(--cyan3);border-radius:22px;padding:5px 13px;
+  display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;color:var(--cyan2);
+  box-shadow:0 2px 10px rgba(0,180,216,0.12);}
+.coin-usd{font-size:10px;color:var(--muted);font-weight:700;}
+
+/* PAGES */
+.page{display:none;padding:13px;position:relative;z-index:1;}
+.page.active{display:block;}
+.section-title{font-family:'Space Grotesk',sans-serif;font-size:11px;letter-spacing:2px;
+  color:var(--muted);text-transform:uppercase;margin-bottom:11px;font-weight:600;}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.stat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;
+  padding:11px 6px;text-align:center;box-shadow:0 2px 10px rgba(0,180,216,0.07);}
+.stat-val{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:var(--cyan2);}
+.stat-label{font-size:10px;color:var(--text);margin-top:3px;line-height:1.2;font-weight:700;}
+
+/* HOME SECTION HEADERS */
+.home-section-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;margin-top:4px;}
+.home-section-hdr .hsicon{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.home-section-hdr .hstitle{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:var(--text);}
+.home-section-hdr .hsbadge{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;display:flex;align-items:center;gap:4px;}
+
+/* SCRATCH */
+.scratch-area{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;
+  padding:14px 13px;margin-bottom:13px;
+  box-shadow:0 4px 20px rgba(0,180,216,0.09);}
+#scratchWrap{position:relative;width:100%;height:148px;margin:0 auto 11px;border-radius:13px;overflow:hidden;
+  cursor:crosshair;box-shadow:0 0 0 2px var(--cyan3),0 6px 28px rgba(0,180,216,0.18);}
+.scratch-reward{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;background:linear-gradient(135deg,#E8F9FF,#FFF5F0);border-radius:13px;}
+.reward-amount{font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:700;
+  background:linear-gradient(120deg,var(--cyan2),var(--orange));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.reward-unit{font-size:12px;color:var(--text);font-weight:700;margin-top:3px;display:flex;align-items:center;gap:6px;}
+.reward-unit span{color:var(--cyan2);font-size:13px;}
+.reward-emoji{font-size:26px;margin-bottom:4px;}
+#scratchCanvas{position:absolute;inset:0;border-radius:13px;touch-action:none;display:block;}
+.scratch-info{font-size:12px;color:var(--text);margin-bottom:10px;font-weight:700;}
+.scratch-info b{color:var(--cyan2);}
+
+/* BUTTONS */
+.btn{width:100%;padding:12px;border:none;border-radius:12px;
+  font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:.6px;cursor:pointer;transition:all 0.2s;margin-bottom:8px;}
+.btn:active{transform:scale(0.97);}
+.btn:disabled{background:#D0EEF8!important;color:var(--muted)!important;box-shadow:none!important;cursor:not-allowed;transform:none!important;}
+.btn-cyan{background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#fff;
+  box-shadow:0 4px 18px rgba(0,180,216,0.30);}
+.btn-orange{background:linear-gradient(135deg,var(--orange),var(--orange2));color:#fff;
+  box-shadow:0 4px 18px rgba(255,107,43,0.30);}
+.btn-green{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;
+  box-shadow:0 4px 18px rgba(0,200,115,0.28);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--cyan2);
+  box-shadow:none;margin-bottom:0;}
+
+.cooldown-wrap{background:var(--border);border-radius:5px;height:5px;margin-top:7px;}
+.cooldown-bar{height:100%;border-radius:5px;
+  background:linear-gradient(90deg,var(--cyan),var(--orange));transition:width 1s linear;}
+.cooldown-txt{font-size:11px;color:var(--text);margin-top:5px;text-align:center;font-weight:700;}
+
+/* CAPTCHA */
+.captcha-card{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;
+  padding:14px 13px;margin-bottom:13px;box-shadow:0 4px 20px rgba(0,180,216,0.08);}
+.captcha-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;flex-wrap:wrap;gap:5px;}
+.badge-type{background:var(--cyan-bg);border:1.5px solid rgba(0,180,216,0.28);
+  border-radius:20px;padding:4px 11px;font-size:11px;color:var(--cyan2);font-weight:700;}
+.badge-reward{background:var(--orange-bg);border:1.5px solid rgba(255,107,43,0.28);
+  border-radius:20px;padding:4px 11px;font-size:11px;color:var(--orange);font-weight:700;
+  display:flex;align-items:center;gap:4px;}
+.captcha-instruction{font-size:14px;color:var(--text);margin-bottom:11px;font-weight:700;text-align:center;line-height:1.4;}
+.captcha-instruction .target-emoji{font-size:26px;display:block;margin:5px 0;}
+.captcha-instruction .sub{font-size:11px;color:var(--muted);font-weight:700;}
+.img-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:11px;}
+.img-tile{aspect-ratio:1;border-radius:12px;border:2px solid var(--border);cursor:pointer;
+  transition:all 0.15s;display:flex;align-items:center;justify-content:center;
+  background:#F5FCFF;font-size:30px;position:relative;user-select:none;-webkit-user-select:none;}
+.img-tile:active{transform:scale(0.90);}
+.img-tile.selected{border-color:var(--cyan);background:var(--cyan-bg);transform:scale(0.93);}
+.img-tile.selected::after{content:'✓';position:absolute;top:4px;right:4px;
+  background:var(--cyan);color:#fff;border-radius:50%;width:18px;height:18px;
+  font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;line-height:18px;}
+.img-tile.correct-reveal{border-color:var(--green);background:var(--green-bg);}
+.img-tile.wrong-reveal{border-color:var(--red);background:rgba(255,71,87,0.08);}
+
+/* TOAST */
+.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-12px);
+  background:#fff;border:1.5px solid var(--border);border-radius:14px;
+  padding:9px 18px;font-weight:700;font-size:13px;opacity:0;
+  transition:all 0.25s;z-index:9999;white-space:nowrap;pointer-events:none;max-width:90vw;
+  box-shadow:0 6px 24px rgba(0,180,216,0.14);
+  display:flex;align-items:center;gap:7px;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.success{border-color:var(--green);color:var(--green);}
+.toast.error{border-color:var(--red);color:var(--red);}
+.toast.info{border-color:var(--cyan);color:var(--cyan2);}
+.toast.gold{border-color:var(--orange);color:var(--orange);}
+
+/* LEADERBOARD */
+.lb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);
+  border:1.5px solid var(--border);border-radius:12px;box-shadow:0 2px 8px rgba(0,180,216,0.06);}
+.lb-rank{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:var(--muted);flex-shrink:0;}
+.lb-item.top1 .lb-rank{background:linear-gradient(135deg,#FFD700,#FFB800);color:#fff;}
+.lb-item.top2 .lb-rank{background:linear-gradient(135deg,#C9D2DA,#9AA6B2);color:#fff;}
+.lb-item.top3 .lb-rank{background:linear-gradient(135deg,#E0A45C,#C77E2C);color:#fff;}
+.lb-name{flex:1;min-width:0;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;}
+.lb-pts{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:var(--cyan2);flex-shrink:0;}
+.lb-item.me{border-color:var(--cyan2);background:var(--cyan-bg);}
+
+/* HISTORY */
+.history-item{display:flex;align-items:center;justify-content:space-between;
+  padding:11px 12px;background:var(--surface);border:1.5px solid var(--border);
+  border-radius:12px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,180,216,0.06);}
+.history-left{display:flex;align-items:center;gap:9px;}
+.h-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.h-type{font-size:13px;font-weight:700;color:var(--text);}
+.h-time{font-size:10px;color:var(--muted);font-weight:700;}
+.h-amount{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;}
+
+/* WITHDRAW */
+.wd-card{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;
+  padding:15px 13px;margin-bottom:13px;box-shadow:0 4px 20px rgba(0,180,216,0.09);}
+.wd-balance{text-align:center;margin-bottom:15px;}
+.wd-bal-coins{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;
+  color:var(--cyan2);margin:4px 0;display:flex;align-items:center;justify-content:center;gap:10px;}
+.wd-bal-usd{font-size:13px;color:var(--text);font-weight:700;}
+.input-group{margin-bottom:11px;}
+.input-label{font-size:11px;color:var(--text);margin-bottom:5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;}
+.input-field{width:100%;padding:12px 13px;background:#F5FCFF;
+  border:1.5px solid var(--border);border-radius:11px;
+  color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;
+  outline:none;transition:border-color 0.2s;}
+.input-field:focus{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-glow);}
+.wd-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
+.min-badge{background:rgba(255,71,87,0.08);border:1.5px solid rgba(255,71,87,0.25);
+  border-radius:8px;padding:4px 10px;font-size:11px;color:var(--red);font-weight:700;}
+.max-btn{background:none;border:none;color:var(--cyan2);font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:13px;font-weight:700;cursor:pointer;}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,42,53,0.55);backdrop-filter:blur(4px);
+  z-index:9000;display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.modal-overlay.show{opacity:1;pointer-events:all;}
+.modal-box{background:#fff;border-radius:22px 22px 0 0;padding:22px 18px 32px;
+  width:100%;max-width:480px;transform:translateY(100%);
+  transition:transform 0.32s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 -8px 40px rgba(0,180,216,0.18);}
+.modal-overlay.show .modal-box{transform:translateY(0);}
+.modal-handle{width:38px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 18px;}
+.modal-icon{width:64px;height:64px;border-radius:20px;margin:0 auto 14px;
+  display:flex;align-items:center;justify-content:center;}
+.modal-title{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;
+  color:var(--text);text-align:center;margin-bottom:6px;}
+.modal-sub{font-size:13px;color:var(--muted);text-align:center;font-weight:600;margin-bottom:18px;line-height:1.5;}
+.modal-detail-row{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 13px;background:var(--bg);border-radius:11px;margin-bottom:8px;}
+.modal-detail-label{font-size:12px;color:var(--muted);font-weight:700;}
+.modal-detail-val{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:var(--text);}
+.modal-btns{display:flex;gap:9px;margin-top:16px;}
+.modal-btns .btn{margin-bottom:0;flex:1;}
+.legal-modal-box{max-height:80vh;display:flex;flex-direction:column;}
+.legal-scroll{overflow-y:auto;flex:1;padding-right:2px;margin-bottom:14px;}
+.legal-scroll h4{font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--text);margin:14px 0 6px;}
+.legal-scroll h4:first-child{margin-top:0;}
+.legal-scroll p{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:6px;font-weight:600;}
+.legal-scroll ul{margin:4px 0 6px 18px;padding:0;}
+.legal-scroll li{font-size:12px;color:var(--muted);line-height:1.6;font-weight:600;margin-bottom:3px;}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1.5px solid var(--border);display:flex;
+  box-shadow:0 -4px 24px rgba(0,180,216,0.12);}
+.nav-btn{flex:1;padding:8px 4px 6px;background:none;border:none;color:var(--muted);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:9.5px;font-weight:700;
+  transition:all 0.25s;letter-spacing:.2px;}
+.nav-icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  border-radius:9px;transition:all 0.25s;}
+.nav-icon svg{width:20px;height:20px;transition:all 0.25s;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.nav-btn.active{color:var(--cyan2);}
+.nav-btn.active .nav-icon{background:var(--cyan-bg);
+  box-shadow:0 0 10px rgba(0,180,216,0.28),0 0 22px rgba(0,180,216,0.12);}
+.nav-btn.active .nav-icon svg{stroke:var(--cyan2);
+  filter:drop-shadow(0 0 4px rgba(0,180,216,0.75)) drop-shadow(0 0 9px rgba(0,180,216,0.35));}
+
+/* CONFETTI */
+.cp{position:fixed;width:7px;height:7px;border-radius:2px;pointer-events:none;z-index:9999;animation:cf 1.5s ease-out forwards;}
+@keyframes cf{0%{transform:translateY(0) rotate(0);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+
+/* TASK CARDS */
+.task-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;
+  padding:13px 12px;margin-bottom:10px;display:flex;align-items:center;
+  justify-content:space-between;gap:9px;transition:all 0.3s;
+  box-shadow:0 2px 12px rgba(0,180,216,0.07);}
+.task-card.done{border-color:var(--green);background:var(--green-bg);}
+.task-left{display:flex;align-items:center;gap:11px;flex:1;min-width:0;}
+.task-icon{width:42px;height:42px;border-radius:12px;background:transparent;
+  border:none;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.task-info{min-width:0;}
+.task-name{font-size:13px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:2px;}
+.task-desc{font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:600;}
+.task-reward-badge{display:inline-flex;align-items:center;gap:4px;background:var(--cyan-bg);
+  border:1.5px solid rgba(0,180,216,0.22);border-radius:20px;
+  padding:2px 10px;font-size:10px;color:var(--cyan2);font-weight:700;}
+.task-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0;}
+.btn-task-join{display:block;background:linear-gradient(135deg,var(--cyan),var(--cyan2));
+  color:#fff;font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;
+  padding:7px 13px;border-radius:9px;text-decoration:none;text-align:center;
+  letter-spacing:.4px;white-space:nowrap;box-shadow:0 3px 10px rgba(0,180,216,0.24);}
+.btn-task-verify{background:linear-gradient(135deg,var(--orange),var(--orange2));
+  color:#fff;font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;
+  padding:7px 13px;border-radius:9px;border:none;cursor:pointer;
+  letter-spacing:.4px;transition:all 0.2s;white-space:nowrap;
+  box-shadow:0 3px 10px rgba(255,107,43,0.26);}
+.btn-task-verify:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;box-shadow:none;}
+.btn-task-verify.claimed{background:var(--green-bg);color:var(--green);
+  cursor:not-allowed;border:1.5px solid var(--green);box-shadow:none;}
+
+/* BOT SLIDER */
+.bot-slider-wrap{overflow:hidden;margin-bottom:14px;position:relative;}
+.bot-slider-track{display:flex;gap:10px;transition:transform 0.35s cubic-bezier(.4,0,.2,1);will-change:transform;}
+.bot-card{flex:0 0 calc(100% - 20px);background:linear-gradient(135deg,var(--cyan2),var(--orange));
+  border-radius:18px;padding:16px 15px;display:flex;align-items:center;gap:13px;
+  box-shadow:0 6px 24px rgba(0,180,216,0.28);position:relative;overflow:hidden;}
+.bot-card::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 60% at 90% 10%,rgba(255,255,255,0.13),transparent 60%);
+  pointer-events:none;}
+.bot-card-icon{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,0.18);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 2px 10px rgba(0,0,0,0.12);}
+.bot-card-info{flex:1;min-width:0;}
+.bot-card-label{font-size:10px;color:rgba(255,255,255,0.80);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;}
+.bot-card-name{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.btn-bot{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.22);
+  border:1.5px solid rgba(255,255,255,0.40);border-radius:10px;
+  padding:6px 14px;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;
+  color:#fff;text-decoration:none;letter-spacing:.4px;transition:all 0.2s;}
+.btn-bot:active{background:rgba(255,255,255,0.35);}
+.slider-dots{display:flex;justify-content:center;gap:6px;margin-top:9px;}
+.slider-dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all 0.25s;cursor:pointer;}
+.slider-dot.active{background:var(--cyan2);width:18px;border-radius:4px;}
+
+/* AD CARDS */
+.ads-hero{background:linear-gradient(135deg,var(--cyan2),var(--orange));border-radius:18px;
+  padding:18px;text-align:center;margin-bottom:14px;color:#fff;
+  box-shadow:0 6px 24px rgba(0,150,199,0.28);}
+.ads-hero-coin{width:44px;height:44px;background:rgba(255,255,255,0.22);border-radius:14px;
+  margin:0 auto 10px;display:flex;align-items:center;justify-content:center;
+  font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:900;color:#fff;}
+.ads-hero-title{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;}
+.ads-hero-sub{font-size:12px;color:rgba(255,255,255,0.85);}
+.ad-card{background:var(--surface);border-radius:18px;padding:16px;
+  border:1.5px solid var(--border);margin-bottom:12px;}
+.ad-card-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.ad-card-icon{width:48px;height:48px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 12px rgba(0,0,0,0.12);}
+.ad-card-title{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.ad-card-desc{font-size:11.5px;color:var(--muted);}
+.ad-reward-pill{display:inline-flex;align-items:center;gap:5px;
+  background:#FEF3C7;border:1.5px solid #FCD34D;border-radius:20px;
+  padding:5px 11px;font-size:12px;font-weight:700;color:#92400E;
+  margin-left:auto;flex-shrink:0;}
+.ad-progress-row{display:flex;gap:6px;margin-bottom:10px;}
+.ad-progress-dot{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:700;}
+.btn-watch-ad{width:100%;padding:13px;border:none;border-radius:12px;
+  font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;
+  color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  gap:8px;transition:opacity 0.2s,transform 0.1s;}
+.btn-watch-ad:active{transform:scale(0.97);opacity:0.9;}
+.btn-watch-ad:disabled{background:#E5E7EB!important;color:#9CA3AF!important;
+  box-shadow:none!important;cursor:not-allowed;}
+.ad-cooldown-wrap{width:100%;padding:11px;background:var(--bg);border:1.5px solid var(--border);
+  border-radius:12px;display:flex;align-items:center;justify-content:center;
+  gap:10px;font-size:12px;font-weight:700;color:var(--muted);}
+.ad-cooldown-ring{width:18px;height:18px;border-radius:50%;border:2.5px solid var(--border);
+  border-top-color:var(--cyan2);animation:spin 0.8s linear infinite;flex-shrink:0;}
+.ad-limit-msg{font-size:12px;color:var(--muted);font-weight:700;}
+.ad-cooldown-note{font-size:11px;color:var(--muted);text-align:center;margin-top:8px;}
+.ads-info-box{background:linear-gradient(135deg,#F0FBFF,#FFF5F0);border:1.5px solid var(--border);
+  border-radius:14px;padding:13px;font-size:11.5px;color:var(--muted);line-height:1.9;margin-top:4px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* INFO BOX */
+.info-box{background:linear-gradient(135deg,#EBF9FF,#FFF4EE);
+  border:1.5px solid var(--border);border-radius:13px;
+  padding:11px 13px;font-size:12px;color:var(--text);line-height:1.6;font-weight:600;}
+.info-box strong{color:var(--text2);font-weight:700;}
+
+/* HOME DIVIDER */
+.home-divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:14px 0;}
+
+/* WITHDRAWAL METHOD CARDS */
+.wd-method-card{background:var(--surface);border:2px solid var(--border);border-radius:16px;
+  padding:14px 11px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;
+  box-shadow:0 2px 10px rgba(0,180,216,0.06);}
+.wd-method-card.active{border-color:var(--cyan);background:var(--cyan-bg);
+  box-shadow:0 4px 16px rgba(0,180,216,0.18);}
+.wd-method-card:active{transform:scale(0.97);}
+.wd-method-icon{width:42px;height:42px;border-radius:13px;margin:0 auto 8px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;
+  box-shadow:0 4px 12px rgba(0,0,0,0.15);}
+.wd-method-name{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;
+  color:var(--text);margin-bottom:3px;}
+.wd-method-min{font-size:10px;color:var(--muted);font-weight:600;}
+.wd-method-check{position:absolute;top:9px;right:9px;width:20px;height:20px;
+  background:var(--cyan);border-radius:50%;color:#fff;font-size:11px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,180,216,0.4);}
+
+/* COIN BALANCE CARD */
+.balance-card{background:linear-gradient(135deg,var(--cyan2),var(--orange));
+  border-radius:18px;padding:16px 18px;margin-bottom:14px;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 6px 24px rgba(0,180,216,0.28);}
+.balance-card-left .bc-label{font-size:11px;color:rgba(255,255,255,0.85);font-weight:700;letter-spacing:.8px;text-transform:uppercase;}
+.balance-card-left .bc-coins{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;color:#fff;margin:2px 0;}
+.balance-card-left .bc-usd{font-size:12px;color:rgba(255,255,255,0.85);font-weight:700;}
+.balance-card-right{font-size:44px;opacity:0.28;}
+
+/* NOTICE / ANNOUNCEMENT BANNER */
+.announce-banner{background:linear-gradient(135deg,#FEF2F2,#FEF3C7);
+  border:1.5px solid #FCA5A5;border-radius:14px;padding:11px 12px;
+  margin-bottom:12px;position:relative;}
+.announce-banner-close{position:absolute;top:8px;right:8px;
+  width:20px;height:20px;border-radius:50%;border:none;
+  background:rgba(0,0,0,0.06);color:var(--muted);font-size:12px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.announce-banner-title{font-size:11.5px;font-weight:800;color:#991B1B;
+  margin-bottom:6px;padding-right:24px;line-height:1.35;}
+.announce-banner-body{font-size:10.5px;color:#7F1D1D;line-height:1.5;}
+.announce-banner-body strong{color:#92400E;}
+.announce-banner-list{margin-top:6px;padding-left:0;list-style:none;}
+.announce-banner-list li{margin-bottom:3px;padding-left:17px;position:relative;font-size:10.5px;}
+.announce-banner-list li::before{content:"✅";position:absolute;left:0;top:0;font-size:9.5px;}
+/* DICE ROLL */
+.dice-outer{width:112px;height:112px;margin:8px auto 18px;}
+.dice-face{width:112px;height:112px;background:linear-gradient(145deg,#ffffff,#f0f4f8);
+  border-radius:22px;box-shadow:0 10px 26px rgba(0,180,216,0.18),inset 0 2px 4px rgba(255,255,255,0.9),0 0 0 1.5px var(--border);
+  display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);
+  padding:16px;transition:transform 0.12s ease;}
+.dice-face.rolling{animation:diceShake 0.12s ease-in-out infinite;}
+@keyframes diceShake{
+  0%{transform:rotate(0deg) scale(1);}
+  50%{transform:rotate(-6deg) scale(1.03);}
+  100%{transform:rotate(6deg) scale(1);}
+}
+.dice-cell{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+.dice-cell.active .pip{width:72%;height:72%;border-radius:50%;
+  background:linear-gradient(135deg,#FF6B2B,#FF4757);box-shadow:0 2px 5px rgba(255,71,87,0.45);}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo" style="background:transparent;box-shadow:none;padding:0"><svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;flex-shrink:0"><defs><linearGradient id="rLG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD234"/><stop offset="45%" stop-color="#FF9000"/><stop offset="100%" stop-color="#B84400"/></linearGradient><radialGradient id="fLG" cx="33%" cy="28%" r="72%"><stop offset="0%" stop-color="#FFF5B0"/><stop offset="40%" stop-color="#FFBE38"/><stop offset="100%" stop-color="#C85200"/></radialGradient><filter id="gLG" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="20" cy="22.5" r="18" fill="#6B2000" opacity="0.65"/><circle cx="20" cy="20" r="19" fill="rgba(255,150,0,0.18)" filter="url(#gLG)"/><circle cx="20" cy="20" r="18" fill="url(#rLG)"/><circle cx="20" cy="20" r="15" fill="url(#fLG)"/><circle cx="20" cy="20" r="13" fill="none" stroke="rgba(255,235,100,0.5)" stroke-width="0.8"/><ellipse cx="14" cy="12.5" rx="6.5" ry="3.5" fill="rgba(255,255,255,0.30)" transform="rotate(-32 14 12.5)"/><circle cx="11.5" cy="11" r="2.2" fill="rgba(255,255,255,0.18)"/><circle cx="28" cy="13" r="1" fill="rgba(255,255,200,0.50)"/><text x="20.5" y="26" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="800" font-size="14" fill="rgba(70,15,0,0.35)" letter-spacing="1">EV</text><text x="20" y="25.5" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="800" font-size="14" fill="rgba(80,18,0,0.92)" letter-spacing="1">EV</text></svg></div>
+    <div class="header-title">Earn Verse</div>
+  </div>
+  <div class="coin-chip">
+    <svg width="20" height="20" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;flex-shrink:0"><defs><linearGradient id="rSM" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD234"/><stop offset="50%" stop-color="#FF8C00"/><stop offset="100%" stop-color="#C45000"/></linearGradient><radialGradient id="fSM" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#FFF0A0"/><stop offset="45%" stop-color="#FFB830"/><stop offset="100%" stop-color="#CC5500"/></radialGradient></defs><circle cx="20" cy="22" r="18" fill="#7A2800" opacity="0.55"/><circle cx="20" cy="20" r="18" fill="url(#rSM)"/><circle cx="20" cy="20" r="15" fill="url(#fSM)"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="rgba(255,240,120,0.4)" stroke-width="1"/><ellipse cx="15" cy="13" rx="5.5" ry="3" fill="rgba(255,255,255,0.28)" transform="rotate(-30 15 13)"/><text x="20" y="25" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="800" font-size="13" fill="rgba(90,25,0,0.90)" letter-spacing="0.5">EV</text></svg>
+    <div>
+      <div id="coinDisplay">0</div>
+      <div class="coin-usd">Your Coins</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ HOME PAGE ═══════════════ -->
+<div class="page active" id="page-home">
+
+  <!-- Balance Card -->
+  <div class="balance-card">
+    <div class="balance-card-left">
+      <div class="bc-label">Total Coins</div>
+      <div class="bc-coins"><svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;flex-shrink:0"><defs><linearGradient id="rLG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD234"/><stop offset="45%" stop-color="#FF9000"/><stop offset="100%" stop-color="#B84400"/></linearGradient><radialGradient id="fLG" cx="33%" cy="28%" r="72%"><stop offset="0%" stop-color="#FFF5B0"/><stop offset="40%" stop-color="#FFBE38"/><stop offset="100%" stop-color="#C85200"/></radialGradient><filter id="gLG" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="20" cy="22.5" r="18" fill="#6B2000" opacity="0.65"/><circle cx="20" cy="20" r="19" fill="rgba(255,150,0,0.18)" filter="url(#gLG)"/><circle cx="20" cy="20" r="18" fill="url(#rLG)"/><circle cx="20" cy="20" r="15" fill="url(#fLG)"/><circle cx="20" cy="20" r="13" fill="none" stroke="rgba(255,235,100,0.5)" stroke-width="0.8"/><ellipse cx="14" cy="12.5" rx="6.5" ry="3.5" fill="rgba(255,255,255,0.30)" transform="rotate(-32 14 12.5)"/><circle cx="11.5" cy="11" r="2.2" fill="rgba(255,255,255,0.18)"/><circle cx="28" cy="13" r="1" fill="rgba(255,255,200,0.50)"/><text x="20.5" y="26" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="800" font-size="14" fill="rgba(70,15,0,0.35)" letter-spacing="1">EV</text><text x="20" y="25.5" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="800" font-size="14" fill="rgba(80,18,0,0.92)" letter-spacing="1">EV</text></svg> <span id="homeCoins">0</span></div>
+      <div class="bc-usd">Play more to fun!</div>
+    </div>
+    <div class="balance-card-right">🏆</div>
+  </div>
+
+  <!-- ── SCRATCH SECTION ── -->
+  <div class="home-section-hdr">
+    <div class="hsicon" style="background:linear-gradient(135deg,rgba(0,180,216,0.15),rgba(0,150,199,0.08))"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="4" width="20" height="16" rx="2.5" stroke="#00B4D8" stroke-width="1.8" fill="rgba(0,180,216,0.10)"/>
+  <line x1="7" y1="9" x2="11" y2="15" stroke="#00B4D8" stroke-width="2" stroke-linecap="round"/>
+  <line x1="10" y1="8" x2="14" y2="15" stroke="#00B4D8" stroke-width="2" stroke-linecap="round"/>
+  <line x1="13" y1="9" x2="17" y2="15" stroke="#00B4D8" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="5" cy="7" r="1.2" fill="#00B4D8"/>
+</svg></div>
+    <div class="hstitle">Scratch Card</div>
+    <div class="hsbadge" style="background:var(--cyan-bg);border:1.5px solid rgba(0,180,216,0.22);color:var(--cyan2)"><span id="scratchLeft">∞</span> Unlimited</div>
+  </div>
+
+  <div class="scratch-area">
+    <div id="scratchWrap">
+      <div class="scratch-reward" id="rewardLayer">
+        <div class="reward-emoji" id="rewardEmoji">🎁</div>
+        <div class="reward-amount" id="rewardAmt">????</div>
+        <div class="reward-unit"><svg width="20" height="20" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;flex-shrink:0"><defs><linearGradient id="rSM" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD234"/><stop offset="50%" stop-color="#FF8C00"/><stop offset="100%" stop-color="#C45000"/></linearGradient><radialGradient id="fSM" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#FFF0A0"/><stop offset="45%" stop-color="#FFB830"/><stop offset="100%" stop-color="#CC5500"/></radialGradient></defs><circle cx="20" cy="22" r="18" fill="#7A2800" opacity="0.55"/><circle cx="20" cy="20" r="18" fill="url(#rSM)"/><circle cx="20" cy="20" r="15" fill="url(#fSM)"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="rgba(255,240,120,0.4)" stroke-width="1"/><ellipse cx="15" cy="13" rx="5.5" ry="3" fill="rgba(255,255,255,0.28)" transform="rotate(-30 15 13)"/><text x="20" y="25" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="800" font-size="13" fill="rgba(90,25,0,0.90)" letter-spacing="0.5">EV</text></svg> COINS</div>
+      </div>
+      <canvas id="scratchCanvas"></canvas>
+    </div>
+    <div class="scratch-info">Scratch here → <b id="scratchPct">0%</b> revealed → Collect coins!</div>
+    <button class="btn btn-cyan" id="collectBtn" disabled onclick="collectReward()">🎁 COLLECT COINS</button>
+    <button class="btn btn-outline" onclick="newScratchCard()" style="border-color:var(--cyan3);color:var(--cyan2)">🔄 NEW SCRATCH CARD</button>
+    <div class="cooldown-wrap" id="cooldownWrap" style="display:none"><div class="cooldown-bar" id="cooldownBar" style="width:100%"></div></div>
+    <div class="cooldown-txt" id="cooldownTxt"></div>
+  </div>
+
+  <div class="home-divider"></div>
+
+  <!-- ── CAPTCHA SECTION ── -->
+  <div class="home-section-hdr">
+    <div class="hsicon" style="background:linear-gradient(135deg,rgba(255,107,43,0.15),rgba(255,140,85,0.08))"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="2" width="8" height="8" rx="1.5" stroke="#FF6B2B" stroke-width="1.8" fill="rgba(255,107,43,0.15)"/>
+  <rect x="14" y="2" width="8" height="8" rx="1.5" stroke="#FF6B2B" stroke-width="1.8"/>
+  <rect x="2" y="14" width="8" height="8" rx="1.5" stroke="#FF6B2B" stroke-width="1.8"/>
+  <rect x="14" y="14" width="8" height="8" rx="1.5" stroke="#FF6B2B" stroke-width="1.8" fill="rgba(255,107,43,0.15)"/>
+  <path d="M10 12h4M12 10v4" stroke="#FF6B2B" stroke-width="1.8" stroke-linecap="round"/>
+</svg></div>
+    <div class="hstitle">Image Captcha</div>
+    <div class="hsbadge" style="background:var(--orange-bg);border:1.5px solid rgba(255,107,43,0.22);color:var(--orange)"><span id="captchaLeft">∞</span> Unlimited</div>
+  </div>
+
+  <div id="captchaContainer"></div>
+  <div id="captchaCooldownWrap" style="display:none;margin-bottom:13px">
+    <div class="cooldown-wrap"><div class="cooldown-bar" id="captchaCooldownBar" style="width:100%"></div></div>
+    <div class="cooldown-txt" id="captchaCooldownTxt">⏳ Next captcha in: 120s</div>
+  </div>
+  <button class="btn btn-orange" id="skipCaptchaBtn" onclick="skipCaptcha()" style="margin-bottom:13px">⏭ SKIP / NEXT CAPTCHA</button>
+
+  <!-- Stats row at bottom -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-val" id="scratchCount">0</div>
+      <div class="stat-label">Scratched</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="captchaCount">0</div>
+      <div class="stat-label">Captcha ✅</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="captchaStreak">0</div>
+      <div class="stat-label">🔥 Streak</div>
+    </div>
+  </div>
+
+  <div class="info-box" style="margin-top:4px">💡 <strong>5 Scratch Cards daily</strong> + <strong>Captcha every 2 min!</strong> Keep playing to earn more Coins!</div>
+
+  <div style="text-align:center;margin-top:16px;padding-bottom:4px">
+    <a href="javascript:void(0)" onclick="openModal('legalModal')" style="font-size:11px;color:var(--muted);font-weight:700;text-decoration:underline;">📄 Privacy Policy &amp; Disclaimer</a>
+  </div>
+</div>
+
+<!-- ═══════════════ TASKS PAGE ═══════════════ -->
+<div class="page" id="page-tasks">
+  <p class="section-title">🎮 Games — Dice, Spin & Wheel</p>
+
+  <div class="home-section-hdr">
+    <div class="hsicon" style="background:linear-gradient(135deg,rgba(0,180,216,0.15),rgba(0,150,199,0.08))"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="12" cy="12" r="9" stroke="#00B4D8" stroke-width="1.8" fill="rgba(0,180,216,0.10)"/>
+  <circle cx="12" cy="12" r="2.2" fill="#00B4D8"/>
+  <path d="M12 3v3M21 12h-3M12 21v-3M3 12h3" stroke="#00B4D8" stroke-width="1.8" stroke-linecap="round"/>
+</svg></div>
+    <div class="hstitle">Daily Spin Wheel</div>
+    <div class="hsbadge" style="background:var(--cyan-bg);border:1.5px solid rgba(0,180,216,0.22);color:var(--cyan2)"><span id="spinLeft">∞</span> Unlimited</div>
+  </div>
+
+  <div class="scratch-area" style="text-align:center">
+    <div id="spinWheelWrap" style="position:relative;width:250px;height:250px;margin:6px auto 16px;">
+      <div style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);z-index:3;width:0;height:0;
+        border-left:11px solid transparent;border-right:11px solid transparent;border-top:18px solid var(--orange);
+        filter:drop-shadow(0 2px 4px rgba(255,107,43,0.4));"></div>
+      <canvas id="spinWheelCanvas" width="250" height="250" style="position:absolute;inset:0;border-radius:50%;
+        box-shadow:0 0 0 4px var(--surface),0 0 0 6px var(--cyan3),0 8px 28px rgba(0,180,216,0.22);
+        transition:transform 4.2s cubic-bezier(.17,.89,.32,1.1);"></canvas>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+        width:52px;height:52px;border-radius:50%;border:3px solid #fff;z-index:4;pointer-events:none;
+        background:linear-gradient(135deg,var(--cyan),var(--orange));color:#fff;
+        display:flex;align-items:center;justify-content:center;
+        box-shadow:0 4px 14px rgba(0,180,216,0.35);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="8" stroke="#fff" stroke-width="1.8"/>
+          <circle cx="12" cy="12" r="2" fill="#fff"/>
+        </svg>
+      </div>
+    </div>
+    <div class="scratch-info" id="spinInfoTxt">Tap the button below to try your luck — win up to <b>10 EV Coins!</b></div>
+    <button class="btn btn-cyan" id="spinHubBtn" onclick="spinWheel()">🎡 SPIN NOW</button>
+    <div class="cooldown-wrap" id="spinCooldownWrap" style="display:none"><div class="cooldown-bar" id="spinCooldownBar" style="width:100%"></div></div>
+    <div class="cooldown-txt" id="spinCooldownTxt"></div>
+  </div>
+
+  <div class="ads-info-box">
+    ⏰ <strong id="spinLeft2">∞</strong> unlimited free spins · Play anytime
+  </div>
+
+  <div class="home-divider"></div>
+
+  <!-- ── DICE ROLL SECTION ── -->
+  <div class="home-section-hdr">
+    <div class="hsicon" style="background:linear-gradient(135deg,rgba(255,107,43,0.15),rgba(255,140,85,0.08))"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="3" y="3" width="18" height="18" rx="4" stroke="#FF6B2B" stroke-width="1.8" fill="rgba(255,107,43,0.10)"/>
+  <circle cx="8" cy="8" r="1.4" fill="#FF6B2B"/>
+  <circle cx="16" cy="8" r="1.4" fill="#FF6B2B"/>
+  <circle cx="12" cy="12" r="1.4" fill="#FF6B2B"/>
+  <circle cx="8" cy="16" r="1.4" fill="#FF6B2B"/>
+  <circle cx="16" cy="16" r="1.4" fill="#FF6B2B"/>
+</svg></div>
+    <div class="hstitle">Daily Dice Roll</div>
+    <div class="hsbadge" style="background:var(--orange-bg);border:1.5px solid rgba(255,107,43,0.22);color:var(--orange)"><span id="diceLeft">∞</span> Unlimited</div>
+  </div>
+
+  <div class="scratch-area" style="text-align:center">
+    <div class="dice-outer">
+      <div class="dice-face" id="diceFace"></div>
+    </div>
+    <div class="scratch-info" id="diceInfoTxt">Tap to roll — win up to <b>5 EV Coins!</b></div>
+    <button class="btn btn-orange" id="diceRollBtn" onclick="rollDice()">🎲 ROLL DICE</button>
+  </div>
+
+  <div class="ads-info-box">
+    ⏰ <strong id="diceLeft2">∞</strong> unlimited free rolls · Play anytime
+  </div>
+
+</div>
+
+<!-- ═══════════════ LEADERBOARD PAGE ═══════════════ -->
+<div class="page" id="page-leaderboard">
+  <p class="section-title">🏆 Leaderboard — Top 20</p>
+  <div id="leaderboardList" style="display:flex;flex-direction:column;gap:8px;"></div>
+  <div id="leaderboardMe" style="margin-top:12px;"></div>
+</div>
+
+<!-- ═══════════════ HISTORY PAGE ═══════════════ -->
+<div class="page" id="page-history">
+  <p class="section-title">Activity History</p>
+  <div id="historyList">
+    <div style="text-align:center;padding:36px 20px;color:var(--muted)">
+      <div style="font-size:36px;margin-bottom:10px">📊</div>
+      <div style="font-weight:600;">No activity yet.<br>Start with Scratch or Captcha on Home!</div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('home')" id="nav-home">
+    <span class="nav-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+    </span>Home
+  </button>
+  <button class="nav-btn" onclick="switchTab('tasks')" id="nav-tasks">
+    <span class="nav-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.4" fill="currentColor" stroke="none"/></svg>
+    </span>Games
+  </button>
+  <button class="nav-btn" onclick="switchTab('history')" id="nav-history">
+    <span class="nav-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M3 18h12"/><circle cx="19" cy="18" r="2"/><path d="M19 16v-4"/></svg>
+    </span>History
+  </button>
+  <button class="nav-btn" onclick="switchTab('leaderboard')" id="nav-leaderboard">
+    <span class="nav-icon">
+      <svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a2 2 0 0 0 2 4M17 6h3a2 2 0 0 1-2 4"/></svg>
+    </span>Ranks
+  </button>
+</div>
+
+<!-- ═══════ LEGAL MODAL (Privacy Policy & Disclaimer) ═══════ -->
+<div class="modal-overlay" id="legalModal">
+  <div class="modal-box legal-modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Privacy Policy &amp; Disclaimer</div>
+    <div class="modal-sub" style="margin-bottom:10px">Please read before using Earn Verse.</div>
+    <div class="legal-scroll">
+      <h4>📄 Privacy Policy</h4>
+      <p>Earn Verse ("the App") runs inside Telegram as a Mini App. We collect the minimum data needed to operate:</p>
+      <ul>
+        <li>Your Telegram user ID/username, provided automatically by Telegram, used to identify your account and coin balance.</li>
+        <li>App activity such as coins earned, spins, scratch cards and captchas completed — stored locally on your device and used to calculate your balance.</li>
+      </ul>
+      <p>We do not sell your data to third parties. We do not access your Telegram messages, contacts or chats.</p>
+      <p>By using the App you consent to this data being processed as described above. You can stop using the App at any time; local app data can be cleared by clearing your browser/Telegram cache.</p>
+
+      <h4>⚠️ Disclaimer</h4>
+      <ul>
+        <li>EV Coins are an in-app virtual reward for entertainment purposes only. They have no monetary value, cannot be exchanged for cash or any other item of value, and cannot be withdrawn.</li>
+        <li>The App is provided "as is" without warranties of any kind. We are not liable for any loss arising from use of the App or technical issues.</li>
+        <li>These terms may be updated at any time; continued use of the App means you accept the current version.</li>
+      </ul>
+    </div>
+    <button class="btn btn-cyan" onclick="closeModal('legalModal')" style="margin-bottom:0">✅ I Understand</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════
+const CFG = {
+  SCRATCH_PER_DAY: 5,
+  SCRATCH_COOLDOWN: 120,         // 2 minutes cooldown
+  SCRATCH_REWARDS: [1],
+  SCRATCH_WEIGHTS: [100],
+  CAPTCHA_REWARD: 1,
+  CAPTCHA_COOLDOWN: 180,          // 3 minutes captcha cooldown
+  CAPTCHA_DAILY_LIMIT: 3,        // max 3 captchas per day
+  SPIN_DAILY_LIMIT: 3,
+  SPIN_REWARDS: [1, 2, 1, 3, 1, 5, 1, 10],
+  SPIN_WEIGHTS: [28, 20, 28, 14, 20, 7, 20, 3],
+  DICE_DAILY_LIMIT: 5,
+  DICE_REWARDS: [1, 1, 2, 2, 3, 5], // reward for face 1..6 respectively
+};
+
+// Vercel API URL (replace after deploy)
+const VERIFY_API = 'https://YOUR-PROJECT.vercel.app/api/check-member';
+const TASK_CHANNELS = [];
+const TASK_NAMES    = [];
+
+// ════════════════════════════════════
+//  CAPTCHA DATA
+// ════════════════════════════════════
+const CAPTCHA_SETS = {
+  'Cars 🚗':    ['🚗','🚕','🚙','🏎','🚓','🚐','🚌','🚑','🚒'],
+  'Animals 🐶': ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨'],
+  'Fruits 🍎':  ['🍎','🍊','🍋','🍇','🍓','🍑','🥭','🍒','🍍'],
+  'Food 🍕':    ['🍕','🍔','🍟','🌮','🍜','🍣','🍩','🍦','🧁'],
+  'Sports ⚽':  ['⚽','🏀','🏈','⚾','🎾','🏐','🏉','🎱','🏓'],
+  'Travel ✈️':  ['✈️','🚀','🚢','🚂','🚁','🛸','🛥️','🚤','⛵'],
+  'Flowers 🌸': ['🌸','🌺','🌻','🌹','🌷','🌼','💐','🌿','🍀'],
+  'Gems 💎':    ['💎','💍','🔮','🪩','✨','⭐','🌟','💫','🔯'],
+  'Bugs 🦋':    ['🦋','🐝','🐛','🦗','🕷','🐞','🦟','🪲','🐜'],
+  'Music 🎵':   ['🎵','🎸','🎹','🎺','🎻','🥁','🪕','🎷','🪗'],
+};
+
+// ════════════════════════════════════
+//  STATE
+// ════════════════════════════════════
+let S = {
+  coins: 0,
+  scratchCount: 0, scratchEarned: 0,
+  captchaCount: 0, captchaStreak: 0, captchaEarned: 0,
+  captchaDate: '',
+  history: [],
+  currentReward: 0,
+  scratchRevealed: false, scratchCollected: false,
+  lastScratchTime: 0,
+  lastCaptchaTime: 0,
+  taskJoined: [false, false],
+  taskClaimedDate: ['', ''],
+  spinCount: 0, spinDate: '', spinRotation: 0,
+  diceCount: 0, diceDate: '', lastDiceFace: 1,
+};
+
+let tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+loadState();
+
+// ════════════════════════════════════
+//  PERSIST
+// ════════════════════════════════════
+function saveState() { try { localStorage.setItem('rc_v1', JSON.stringify(S)); } catch(e){} }
+function loadState() {
+  try {
+    const raw = localStorage.getItem('rc_v1');
+    if (!raw) return;
+    Object.assign(S, JSON.parse(raw));
+    // Reset scratch count if new day
+    if (new Date(S.lastScratchTime||0).toDateString() !== new Date().toDateString()) S.scratchCount = 0;
+    // Reset captcha daily count if new day
+    if (S.captchaDate !== todayStr()) { S.captchaCount = 0; S.captchaDate = todayStr(); }
+    // Reset spin count if new day
+    if (S.spinDate !== todayStr()) { S.spinCount = 0; S.spinDate = todayStr(); }
+    // Reset dice count if new day
+    if (S.diceDate !== todayStr()) { S.diceCount = 0; S.diceDate = todayStr(); }
+  } catch(e){}
+}
+
+// ════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════
+function fmtCoins(n) { return Math.floor(n||0).toLocaleString(); }
+function todayStr() {
+  // IST = UTC+5:30
+  const now = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
+  return now.toISOString().slice(0, 10);
+}
+
+function updateUI() {
+  // Header + Home balance
+  document.getElementById('coinDisplay').textContent = fmtCoins(S.coins);
+  document.getElementById('homeCoins').textContent = fmtCoins(S.coins);
+  // Stats
+  document.getElementById('scratchCount').textContent = S.scratchCount;
+  document.getElementById('scratchLeft').textContent = '∞';
+  document.getElementById('captchaCount').textContent = S.captchaCount;
+  const captchaLeftEl = document.getElementById('captchaLeft');
+  if(captchaLeftEl) captchaLeftEl.textContent = '∞';
+  document.getElementById('captchaStreak').textContent = S.captchaStreak;
+  renderHistory();
+  renderTasks();
+}
+
+const COIN_TOAST_SVG = `<svg width="22" height="22" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><defs><linearGradient id="rT" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD234"/><stop offset="50%" stop-color="#FF8C00"/><stop offset="100%" stop-color="#C45000"/></linearGradient><radialGradient id="fT" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#FFF0A0"/><stop offset="45%" stop-color="#FFB830"/><stop offset="100%" stop-color="#CC5500"/></radialGradient></defs><circle cx="20" cy="22" r="18" fill="#7A2800" opacity="0.55"/><circle cx="20" cy="20" r="18" fill="url(#rT)"/><circle cx="20" cy="20" r="15" fill="url(#fT)"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="rgba(255,240,120,0.4)" stroke-width="1"/><ellipse cx="15" cy="13" rx="5.5" ry="3" fill="rgba(255,255,255,0.28)" transform="rotate(-30 15 13)"/><text x="20" y="25" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="800" font-size="13" fill="rgba(90,25,0,0.90)" letter-spacing="0.5">EV</text></svg>`;
+
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  const hasCoins = msg.includes('EV Coin') || msg.includes('EV coin') || msg.includes('USDT sent') || msg.includes('USDT bheja');
+  t.innerHTML = (hasCoins ? COIN_TOAST_SVG : '') + '<span>' + msg + '</span>';
+  t.className = 'toast ' + type + ' show';
+  clearTimeout(t._t);
+  t._t = setTimeout(()=> t.classList.remove('show'), 2800);
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  document.getElementById('nav-'+tab).classList.add('active');
+  if (tab==='home' && !S.scratchCollected) setTimeout(resizeScratch, 60);
+  if (tab==='tasks'){ drawSpinWheel(); updateSpinUI(); renderDiceFace(S.lastDiceFace||1); updateDiceUI(); }
+  if (tab==='leaderboard'){ renderLeaderboard(); }
+}
+
+const LB_NAMES = ['Rohit_Kumar','Ananya_S','CryptoRaj','Priya.eth','Sahil_99','Neha_Verma','Arjun_W3',
+  'Vikram.sol','Divya_M','Karan_Trades','Isha_Coins','Aditya_K','Meera_Sharma','Yash_99','Riya_Bansal',
+  'Manish_G','Pooja_D','Suresh_Nair','Tanvi_R','Rahul_Deshmukh','Simran_Kaur','Aman_Verma'];
+
+function renderLeaderboard(){
+  const listEl = document.getElementById('leaderboardList');
+  const meEl = document.getElementById('leaderboardMe');
+  if(!listEl) return;
+  // Seeded pseudo-random so the list stays stable per session
+  let seed = 42;
+  const rnd = ()=>{ seed = (seed*9301+49297)%233280; return seed/233280; };
+  const shuffled = [...LB_NAMES].sort(()=>rnd()-0.5).slice(0,20);
+  let base = 48000;
+  const rows = shuffled.map((name,i)=>{
+    base = Math.max(50, base - Math.floor(rnd()*1800+400));
+    return {name, pts: base};
+  });
+  const medals = ['🥇','🥈','🥉'];
+  listEl.innerHTML = rows.map((r,i)=>{
+    const rankCls = i===0?'top1':i===1?'top2':i===2?'top3':'';
+    const rankLabel = i<3 ? medals[i] : (i+1);
+    return `<div class="lb-item ${rankCls}">
+      <div class="lb-rank">${rankLabel}</div>
+      <div class="lb-name">${r.name}</div>
+      <div class="lb-pts">${fmtCoins(r.pts)} EV</div>
+    </div>`;
+  }).join('');
+
+  const myPts = S.coins||0;
+  const myRank = rows.filter(r=>r.pts>myPts).length + 1;
+  meEl.innerHTML = `<div class="lb-item me">
+      <div class="lb-rank">${myRank>20?'20+':myRank}</div>
+      <div class="lb-name">You</div>
+      <div class="lb-pts">${fmtCoins(myPts)} EV</div>
+    </div>`;
+}
+
+function confetti() {
+  const colors=['#00B4D8','#FF6B2B','#00C873','#FFD700','#FF4757','#0096C7','#FF8C55'];
+  for (let i=0;i<32;i++){
+    const el=document.createElement('div');
+    el.className='cp';
+    el.style.cssText=`left:${8+Math.random()*84}vw;top:50px;background:${colors[Math.random()*colors.length|0]};animation-delay:${Math.random()*0.5}s;animation-duration:${1.2+Math.random()*0.8}s`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),2400);
+  }
+}
+
+// ════════════════════════════════════
+//  SCRATCH CARD
+// ════════════════════════════════════
+let sCtx=null, sDrawing=false;
+
+function weightedRandom(vals, weights){
+  const tot=weights.reduce((a,b)=>a+b,0);
+  let r=Math.random()*tot;
+  for(let i=0;i<vals.length;i++){r-=weights[i];if(r<=0)return vals[i];}
+  return vals[0];
+}
+
+function initScratch(){
+  const wrap=document.getElementById('scratchWrap');
+  const cv=document.getElementById('scratchCanvas');
+  const W=wrap.clientWidth||wrap.offsetWidth||300;
+  const H=wrap.clientHeight||148;
+  cv.width=W; cv.height=H;
+  sCtx=cv.getContext('2d');
+
+  S.currentReward=weightedRandom(CFG.SCRATCH_REWARDS, CFG.SCRATCH_WEIGHTS);
+  S.scratchRevealed=false; S.scratchCollected=false;
+
+  // Draw scratch cover
+  const g=sCtx.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,'#0096C7'); g.addColorStop(.5,'#00B4D8'); g.addColorStop(1,'#FF6B2B');
+  sCtx.fillStyle=g; sCtx.fillRect(0,0,W,H);
+  sCtx.fillStyle='rgba(255,255,255,0.07)';
+  for(let x=0;x<W;x+=16) for(let y=0;y<H;y+=16) sCtx.fillRect(x,y,8,8);
+  sCtx.font='14px serif';
+  sCtx.font='bold 11px Space Grotesk,sans-serif'; sCtx.fillStyle='rgba(255,200,80,0.55)'; for(let i=0;i<10;i++) sCtx.fillText('RC',Math.random()*(W-30)+8,Math.random()*(H-14)+14);
+  sCtx.fillStyle='rgba(255,255,255,0.92)';
+  sCtx.font='bold 16px Plus Jakarta Sans,sans-serif';
+  sCtx.textAlign='center';
+  sCtx.fillText('👆 SCRATCH HERE TO WIN!', W/2, H/2-6);
+  sCtx.font='12px Plus Jakarta Sans,sans-serif';
+  sCtx.fillStyle='rgba(255,255,255,0.65)';
+  sCtx.fillText('Coins are hidden inside!', W/2, H/2+14);
+
+  document.getElementById('collectBtn').disabled=true;
+  document.getElementById('scratchPct').textContent='0%';
+  document.getElementById('rewardAmt').textContent='????';
+  document.getElementById('rewardEmoji').textContent='🎁';
+
+  cv.onmousedown=e=>{sDrawing=true;e.preventDefault();scratchAt(e);};
+  cv.onmousemove=e=>{if(sDrawing)scratchAt(e);};
+  cv.onmouseup=()=>sDrawing=false;
+  cv.onmouseleave=()=>sDrawing=false;
+  cv.ontouchstart=e=>{sDrawing=true;e.preventDefault();scratchAtT(e);};
+  cv.ontouchmove=e=>{e.preventDefault();if(sDrawing)scratchAtT(e);};
+  cv.ontouchend=()=>sDrawing=false;
+}
+
+function resizeScratch(){
+  if(S.scratchCollected) return;
+  const wrap=document.getElementById('scratchWrap');
+  const cv=document.getElementById('scratchCanvas');
+  if(wrap.clientWidth && wrap.clientWidth!==cv.width) initScratch();
+}
+
+function scratchAt(e){
+  const cv=document.getElementById('scratchCanvas');
+  const r=cv.getBoundingClientRect();
+  doScratch(e.clientX-r.left, e.clientY-r.top);
+}
+function scratchAtT(e){
+  const cv=document.getElementById('scratchCanvas');
+  const r=cv.getBoundingClientRect();
+  doScratch(e.touches[0].clientX-r.left, e.touches[0].clientY-r.top);
+}
+function doScratch(x,y){
+  if(!sCtx||S.scratchCollected) return;
+  sCtx.globalCompositeOperation='destination-out';
+  sCtx.beginPath(); sCtx.arc(x,y,26,0,Math.PI*2); sCtx.fill();
+  checkScratchPct();
+}
+function checkScratchPct(){
+  const cv=document.getElementById('scratchCanvas');
+  const W=cv.width,H=cv.height,step=18;
+  const data=sCtx.getImageData(0,0,W,H).data;
+  let tr=0,tot=0;
+  for(let x=0;x<W;x+=step) for(let y=0;y<H;y+=step){tot++;if(data[(y*W+x)*4+3]<100)tr++;}
+  const pct=Math.min(100,Math.round(tr/tot*100));
+  document.getElementById('scratchPct').textContent=pct+'%';
+  if(pct>=50&&!S.scratchRevealed){
+    S.scratchRevealed=true;
+    document.getElementById('rewardAmt').textContent=fmtCoins(S.currentReward);
+    document.getElementById('rewardEmoji').textContent=S.currentReward>=8?'🤑':S.currentReward>=5?'💰':'🎉';
+    document.getElementById('collectBtn').disabled=false;
+    showToast('Coins revealed! Tap to collect!','gold');
+  }
+}
+
+function newScratchCard(){
+  const elapsed=(Date.now()-S.lastScratchTime)/1000;
+  if(S.lastScratchTime>0&&elapsed<CFG.SCRATCH_COOLDOWN){
+    const left=Math.ceil(CFG.SCRATCH_COOLDOWN-elapsed);
+    showToast('Next card in '+left+'s!','info');
+    startCooldown(left); return;
+  }
+  setTimeout(initScratch,30);
+  showToast('New scratch card ready!','info');
+}
+
+function collectReward(){
+  if(S.scratchCollected||!S.scratchRevealed) return;
+  const btn=document.getElementById('collectBtn');
+  btn.disabled=true;
+  giveScatchCoins();
+}
+
+function giveScatchCoins(){
+  S.scratchCollected=true;
+  S.coins+=S.currentReward; S.scratchEarned+=S.currentReward;
+  S.scratchCount++; S.lastScratchTime=Date.now();
+  addHistory('scratch',S.currentReward,'Scratch Card');
+  const btn=document.getElementById('collectBtn');
+  btn.disabled=true; btn.textContent='🎁 COLLECT COINS';
+  confetti();
+  showToast('+'+fmtCoins(S.currentReward)+' EV Coins collected!','success');
+  saveState(); updateUI();
+  startCooldown(CFG.SCRATCH_COOLDOWN);
+}
+
+let cdT=null;
+function startCooldown(sec){
+  const total=CFG.SCRATCH_COOLDOWN;
+  const wrap=document.getElementById('cooldownWrap');
+  const bar=document.getElementById('cooldownBar');
+  const txt=document.getElementById('cooldownTxt');
+  wrap.style.display='block'; if(cdT)clearInterval(cdT);
+  let left=sec;
+  function fmtSec(s){const m=Math.floor(s/60),ss=s%60;return m>0?m+'m '+ss+'s':ss+'s';}
+  bar.style.width=(left/total*100)+'%';
+  txt.textContent='⏳ Next card in: '+fmtSec(left);
+  cdT=setInterval(()=>{
+    left--;
+    bar.style.width=Math.max(0,left/total*100)+'%';
+    txt.textContent='⏳ Next card in: '+fmtSec(left);
+    if(left<=0){clearInterval(cdT);wrap.style.display='none';txt.textContent='';showToast('New scratch card available!','gold');}
+  },1000);
+}
+
+// ════════════════════════════════════
+//  CAPTCHA
+// ════════════════════════════════════
+let captchaActive = false;
+
+function generateCaptcha(force){
+  captchaActive = false;
+  // Check cooldown (skip if forced or no previous solve)
+  if(!force && S.lastCaptchaTime>0){
+    const elapsed=(Date.now()-S.lastCaptchaTime)/1000;
+    if(elapsed<CFG.CAPTCHA_COOLDOWN){
+      const left=Math.ceil(CFG.CAPTCHA_COOLDOWN-elapsed);
+      startCaptchaCooldown(left);
+      document.getElementById('captchaContainer').innerHTML='<div style="text-align:center;padding:30px 20px;color:var(--muted);font-weight:700;font-size:13px">⏳ Cooldown active...<br><span style="font-size:11px;color:var(--muted)">Complete captcha after timer ends</span></div>';
+      return;
+    }
+  }
+  const keys=Object.keys(CAPTCHA_SETS);
+  const catKey=keys[Math.floor(Math.random()*keys.length)];
+  const pool=CAPTCHA_SETS[catKey];
+  const targetIdx=Math.floor(Math.random()*pool.length);
+  const target=pool[targetIdx];
+  const targetCount=2+Math.floor(Math.random()*3);
+  const otherPool=Object.values(CAPTCHA_SETS).flat().filter(e=>e!==target);
+  let tiles=[];
+  for(let i=0;i<targetCount;i++) tiles.push({e:target,ok:true});
+  while(tiles.length<9){
+    const e=otherPool[Math.floor(Math.random()*otherPool.length)];
+    tiles.push({e,ok:false});
+  }
+  tiles.sort(()=>Math.random()-0.5);
+  const reward=CFG.CAPTCHA_REWARD;
+  document.getElementById('captchaContainer').innerHTML=`
+  <div class="captcha-card">
+    <div class="captcha-header">
+      <div class="badge-type">🖼️ Image Captcha</div>
+      <div class="badge-reward" style="display:flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 40 40" fill="none"><defs><linearGradient id="rBR" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD234"/><stop offset="50%" stop-color="#FF8C00"/><stop offset="100%" stop-color="#C45000"/></linearGradient><radialGradient id="fBR" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#FFF0A0"/><stop offset="45%" stop-color="#FFB830"/><stop offset="100%" stop-color="#CC5500"/></radialGradient></defs><circle cx="20" cy="22" r="18" fill="#7A2800" opacity="0.55"/><circle cx="20" cy="20" r="18" fill="url(#rBR)"/><circle cx="20" cy="20" r="15" fill="url(#fBR)"/><ellipse cx="15" cy="13" rx="5.5" ry="3" fill="rgba(255,255,255,0.28)" transform="rotate(-30 15 13)"/><text x="20" y="25" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="800" font-size="13" fill="rgba(90,25,0,0.90)">EV</text></svg> +${fmtCoins(reward)} Coin</div>
+    </div>
+    <div class="captcha-instruction">
+      <span class="target-emoji">${target}</span>
+      Select all <strong style="color:var(--cyan2)">${target}</strong> images
+      <span class="sub">(${targetCount} match)</span>
+    </div>
+    <div class="img-grid">
+      ${tiles.map(t=>`<div class="img-tile" data-ok="${t.ok}" onclick="toggleTile(this)">${t.e}</div>`).join('')}
+    </div>
+    <button class="btn btn-cyan" onclick="checkCaptcha(${reward})">✅ SUBMIT</button>
+  </div>`;
+  captchaActive = true;
+}
+
+function toggleTile(el){ if(!captchaActive) return; el.classList.toggle('selected'); }
+
+function checkCaptcha(reward){
+  if(!captchaActive) return;
+  captchaActive=false;
+  const tiles=[...document.querySelectorAll('.img-tile')];
+  let allCorrect=true;
+  tiles.forEach(t=>{
+    const isOk=t.dataset.ok==='true';
+    const isSel=t.classList.contains('selected');
+    if(isOk!==isSel) allCorrect=false;
+  });
+  tiles.forEach(t=>{
+    const isOk=t.dataset.ok==='true';
+    if(isOk) t.classList.add('correct-reveal');
+    else if(t.classList.contains('selected')) t.classList.add('wrong-reveal');
+  });
+  const btn=document.querySelector('.captcha-card .btn-cyan');
+  if(btn) btn.disabled=true;
+  setTimeout(()=>{
+    if(allCorrect) captchaWin(reward);
+    else captchaLose();
+  }, 500);
+}
+
+function captchaWin(reward){
+  const btn=document.querySelector('.captcha-card .btn-cyan');
+  if(btn){ btn.disabled=true; }
+  giveCaptchaReward(reward);
+}
+
+function giveCaptchaReward(reward){
+  if(S.captchaDate !== todayStr()){ S.captchaCount=0; S.captchaDate=todayStr(); }
+  S.captchaStreak++; S.coins+=reward; S.captchaEarned+=reward; S.captchaCount++;
+  S.lastCaptchaTime=Date.now();
+  addHistory('captcha',reward,'Image Captcha');
+  confetti();
+  showToast('+'+fmtCoins(reward)+' EV Coin earned!','success');
+  saveState(); updateUI();
+  setTimeout(()=>{
+    document.getElementById('captchaContainer').innerHTML='<div style="text-align:center;padding:30px 20px;color:var(--muted);font-weight:700;font-size:13px">⏳ Cooldown active...<br><span style="font-size:11px;color:var(--muted)">Complete captcha after timer ends</span></div>';
+    startCaptchaCooldown(CFG.CAPTCHA_COOLDOWN);
+  },1200);
+}
+function captchaLose(){
+  S.captchaStreak=0;
+  showToast('Wrong! Streak reset. Try again.','error');
+  saveState(); updateUI();
+  setTimeout(()=>generateCaptcha(true),1100);
+}
+
+let captchaCdT=null;
+function startCaptchaCooldown(sec){
+  const total=CFG.CAPTCHA_COOLDOWN;
+  const wrap=document.getElementById('captchaCooldownWrap');
+  const bar=document.getElementById('captchaCooldownBar');
+  const txt=document.getElementById('captchaCooldownTxt');
+  const skipBtn=document.getElementById('skipCaptchaBtn');
+  wrap.style.display='block';
+  if(skipBtn) skipBtn.disabled=true;
+  if(captchaCdT) clearInterval(captchaCdT);
+  function fmtSecC(s){const m=Math.floor(s/60),ss=s%60;return m>0?m+'m '+ss+'s':ss+'s';}
+  let left=sec;
+  bar.style.width=(left/total*100)+'%';
+  txt.textContent='⏳ Next captcha in: '+fmtSecC(left);
+  captchaCdT=setInterval(()=>{
+    left--;
+    bar.style.width=Math.max(0,left/total*100)+'%';
+    txt.textContent='⏳ Next captcha in: '+fmtSecC(left);
+    if(left<=0){
+      clearInterval(captchaCdT);
+      wrap.style.display='none';
+      if(skipBtn) skipBtn.disabled=false;
+      showToast('New captcha available!','gold');
+      generateCaptcha(true);
+    }
+  },1000);
+}
+
+function skipCaptcha(){
+  if(S.lastCaptchaTime>0){
+    const elapsed=(Date.now()-S.lastCaptchaTime)/1000;
+    if(elapsed<CFG.CAPTCHA_COOLDOWN){
+      showToast('Cooldown active! Wait for timer.','error'); return;
+    }
+  }
+  generateCaptcha(true);
+}
+
+// ════════════════════════════════════
+//  TASKS
+// ════════════════════════════════════
+function taskClaimedToday(idx){
+  S.taskClaimedDate = S.taskClaimedDate || ['',''];
+  return S.taskClaimedDate[idx] === todayStr();
+}
+
+function renderTasks(){
+  S.taskJoined = S.taskJoined || [false,false];
+  S.taskClaimedDate = S.taskClaimedDate || ['',''];
+  for(let i=0;i<2;i++){
+    const card=document.getElementById('taskCard_'+i);
+    const btn=document.getElementById('verifyBtn_'+i);
+    if(!card||!btn) continue;
+    if(taskClaimedToday(i)){
+      card.classList.add('done');
+      btn.textContent='✅ CLAIMED'; btn.classList.add('claimed'); btn.disabled=true;
+      btn.style.background='var(--green-bg)'; btn.style.color='var(--green)';
+      const joinBtn=card.querySelector('.btn-task-join');
+      if(joinBtn) joinBtn.style.opacity='0.5';
+    } else {
+      card.classList.remove('done');
+      btn.textContent='VERIFY'; btn.classList.remove('claimed'); btn.disabled=true;
+      btn.style.background=''; btn.style.color='';
+      S.taskJoined[i]=false;
+      const joinBtn=card.querySelector('.btn-task-join');
+      if(joinBtn) joinBtn.style.opacity='1';
+    }
+  }
+}
+
+function markJoined(idx){
+  if(taskClaimedToday(idx)) return;
+  setTimeout(()=>{
+    const btn=document.getElementById('verifyBtn_'+idx);
+    if(btn && !taskClaimedToday(idx)){
+      btn.disabled=false;
+      btn.textContent='✔ VERIFY';
+      btn.style.background='linear-gradient(135deg,var(--orange),var(--orange2))';
+      btn.style.color='#fff';
+    }
+    showToast('Come back and tap VERIFY!','info');
+  }, 4000);
+}
+
+async function verifyAndClaim(idx){
+  if(taskClaimedToday(idx)){ showToast('Already claimed today! Come back tomorrow.','info'); return; }
+  const userId = tg?.initDataUnsafe?.user?.id;
+  if(!userId){ showToast('Open in Telegram app!','error'); return; }
+  const btn=document.getElementById('verifyBtn_'+idx);
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Checking...'; }
+  try {
+    const res=await fetch(VERIFY_API,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({user_id:userId, channel_username:TASK_CHANNELS[idx]})
+    });
+    const data=await res.json();
+    if(data.ok && data.member){
+      S.taskJoined[idx]=true;
+      S.taskClaimedDate[idx]=todayStr();
+      S.coins+=1;
+      addHistory('task',1,'✅ Daily Task: '+TASK_NAMES[idx]);
+      saveState(); updateUI(); confetti();
+      showToast('+1 EV Coin! Channel membership verified!','success');
+      renderTasks();
+    } else {
+      if(btn){ btn.disabled=false; btn.textContent='✔ VERIFY'; }
+      showToast('You have not joined the channel yet!','error');
+    }
+  } catch(err){
+    if(btn){ btn.disabled=false; btn.textContent='✔ VERIFY'; }
+    showToast('Network error. Please try again.','error');
+  }
+}
+
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+// ════════════════════════════════════
+//  HISTORY
+// ════════════════════════════════════
+function addHistory(type, amount, label){
+  S.history.unshift({type,amount,label,time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})});
+  if(S.history.length>60) S.history.length=60;
+}
+function renderHistory(){
+  const list=document.getElementById('historyList');
+  if(!S.history.length){
+    list.innerHTML='<div style="text-align:center;padding:36px 20px;color:var(--muted)"><div style="font-size:36px;margin-bottom:10px">📊</div><div style="font-weight:600;">No activity yet.<br>Start with Scratch or Captcha!</div></div>';
+    return;
+  }
+  const iconMap={
+    scratch:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:#00B4D8;filter:drop-shadow(0 0 4px rgba(0,180,216,0.75))"> <rect x="2" y="4" width="20" height="16" rx="2.5" stroke-width="1.8" fill="rgba(0,180,216,0.08)"/> <line x1="7" y1="9" x2="11" y2="15" stroke-width="2" stroke-linecap="round"/> <line x1="10" y1="8" x2="14" y2="15" stroke-width="2" stroke-linecap="round"/> <line x1="13" y1="9" x2="17" y2="15" stroke-width="2" stroke-linecap="round"/> <circle cx="5" cy="7" r="1" fill="#00B4D8" stroke="none"/></svg>`,
+    captcha:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:#FF6B2B;filter:drop-shadow(0 0 4px rgba(255,107,43,0.75))"> <rect x="2" y="2" width="8" height="8" rx="1.5" stroke-width="1.8" fill="rgba(255,107,43,0.12)"/> <rect x="14" y="2" width="8" height="8" rx="1.5" stroke-width="1.8"/> <rect x="2" y="14" width="8" height="8" rx="1.5" stroke-width="1.8"/> <rect x="14" y="14" width="8" height="8" rx="1.5" stroke-width="1.8" fill="rgba(255,107,43,0.12)"/> <path d="M10 12h4M12 10v4" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+    task:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke:#00C873;filter:drop-shadow(0 0 4px rgba(0,200,115,0.75))"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12l2 2 4-4"/></svg>`,
+    withdraw:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke:#FF4757;filter:drop-shadow(0 0 4px rgba(255,71,87,0.75))"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`,
+  };
+  const bgMap={scratch:'var(--cyan-bg)',captcha:'var(--orange-bg)',task:'var(--green-bg)',withdraw:'rgba(255,71,87,0.08)'};
+  list.innerHTML=S.history.map(h=>`
+    <div class="history-item">
+      <div class="history-left">
+        <div class="h-icon" style="background:${bgMap[h.type]||'var(--cyan-bg)'}">${iconMap[h.type]||'RC'}</div>
+        <div>
+          <div class="h-type">${h.label}</div>
+          <div class="h-time">${h.time}</div>
+        </div>
+      </div>
+      <div class="h-amount" style="color:${h.amount<0?'var(--red)':'var(--cyan2)'}">
+        ${h.amount<0?'-':'+'}RC ${fmtCoins(Math.abs(h.amount))}
+      </div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════
+//  SPIN WHEEL
+// ════════════════════════════════════
+const SPIN_COLORS = ['#00B4D8','#FF6B2B','#00C873','#0096C7','#FF8C55','#00E88A','#90E0EF','#FFD234'];
+let spinAnimating = false;
+
+function drawSpinWheel(rotationDeg){
+  const canvas = document.getElementById('spinWheelCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const cx = canvas.width/2, cy = canvas.height/2, r = canvas.width/2 - 4;
+  const segs = CFG.SPIN_REWARDS.length;
+  const arc = (2*Math.PI)/segs;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let i=0;i<segs;i++){
+    const start = i*arc - Math.PI/2;
+    const end = start + arc;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,start,end);
+    ctx.closePath();
+    ctx.fillStyle = SPIN_COLORS[i % SPIN_COLORS.length];
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // reward label
+    const mid = start + arc/2;
+    ctx.save();
+    ctx.translate(cx + Math.cos(mid)*r*0.68, cy + Math.sin(mid)*r*0.68);
+    ctx.rotate(mid + Math.PI/2);
+    ctx.fillStyle = '#fff';
+    ctx.font = "800 15px 'Space Grotesk', sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(CFG.SPIN_REWARDS[i], 0, 0);
+    ctx.restore();
+  }
+  // center hub ring
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,0,2*Math.PI);
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+}
+
+function pickSpinReward(){
+  const rewards = CFG.SPIN_REWARDS, weights = CFG.SPIN_WEIGHTS;
+  const total = weights.reduce((a,b)=>a+b,0);
+  let r = Math.random()*total;
+  for(let i=0;i<rewards.length;i++){
+    if(r < weights[i]) return i;
+    r -= weights[i];
+  }
+  return 0;
+}
+
+function updateSpinUI(){
+  const leftEl = document.getElementById('spinLeft');
+  const left2El = document.getElementById('spinLeft2');
+  if(leftEl) leftEl.textContent = '∞';
+  if(left2El) left2El.textContent = '∞';
+  const btn = document.getElementById('spinHubBtn');
+  if(btn) btn.disabled = spinAnimating;
+}
+
+function spinWheel(){
+  if(spinAnimating) return;
+  spinAnimating = true;
+  const btn = document.getElementById('spinHubBtn');
+  if(btn) btn.disabled = true;
+
+  const idx = pickSpinReward();
+  const reward = CFG.SPIN_REWARDS[idx];
+  const segs = CFG.SPIN_REWARDS.length;
+  const segDeg = 360/segs;
+  // Target: rotate so the chosen segment's center lands under the top pointer
+  const targetCenter = idx*segDeg + segDeg/2;
+  const jitter = (Math.random()-0.5)*segDeg*0.6;
+  const extraSpins = 6*360;
+  const finalRotation = S.spinRotation + extraSpins + (360 - targetCenter) - (S.spinRotation % 360) + jitter;
+
+  const canvas = document.getElementById('spinWheelCanvas');
+  canvas.style.transform = `rotate(${finalRotation}deg)`;
+  S.spinRotation = finalRotation;
+
+  setTimeout(()=>{
+    spinAnimating = false;
+    S.spinCount += 1;
+    S.coins += reward;
+    addHistory('task', reward, '🎡 Spin Wheel');
+    saveState(); updateUI(); confetti();
+    showToast('+'+fmtCoins(reward)+' EV Coins won! 🎉','success');
+    if(window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+    const info = document.getElementById('spinInfoTxt');
+    if(info) info.innerHTML = 'You won <b>'+fmtCoins(reward)+' EV Coins!</b> 🎉';
+    updateSpinUI();
+  }, 4300);
+}
+
+// ════════════════════════════════════
+//  DICE ROLL
+// ════════════════════════════════════
+// Standard dice pip layouts on a 3x3 grid (indices 0-8, row-major)
+const DICE_PATTERNS = {
+  1: [4],
+  2: [0,8],
+  3: [0,4,8],
+  4: [0,2,6,8],
+  5: [0,2,4,6,8],
+  6: [0,2,3,5,6,8],
+};
+let diceAnimating = false;
+
+function renderDiceFace(n){
+  const face = document.getElementById('diceFace');
+  if(!face) return;
+  const active = DICE_PATTERNS[n] || DICE_PATTERNS[1];
+  let html = '';
+  for(let i=0;i<9;i++){
+    html += active.includes(i)
+      ? '<div class="dice-cell active"><div class="pip"></div></div>'
+      : '<div class="dice-cell"></div>';
+  }
+  face.innerHTML = html;
+}
+
+function updateDiceUI(){
+  const leftEl = document.getElementById('diceLeft');
+  const left2El = document.getElementById('diceLeft2');
+  if(leftEl) leftEl.textContent = '∞';
+  if(left2El) left2El.textContent = '∞';
+  const btn = document.getElementById('diceRollBtn');
+  if(btn) btn.disabled = diceAnimating;
+}
+
+function rollDice(){
+  if(diceAnimating) return;
+  diceAnimating = true;
+  const btn = document.getElementById('diceRollBtn');
+  if(btn) btn.disabled = true;
+  const face = document.getElementById('diceFace');
+  if(face) face.classList.add('rolling');
+
+  const finalFace = Math.floor(Math.random()*6)+1;
+  const reward = CFG.DICE_REWARDS[finalFace-1];
+
+  // Cycle random faces briefly for a "rolling" effect, then settle
+  let ticks = 0;
+  const maxTicks = 10;
+  const iv = setInterval(()=>{
+    renderDiceFace(Math.floor(Math.random()*6)+1);
+    ticks++;
+    if(ticks >= maxTicks){
+      clearInterval(iv);
+      renderDiceFace(finalFace);
+      if(face) face.classList.remove('rolling');
+      S.lastDiceFace = finalFace;
+      diceAnimating = false;
+      S.diceCount += 1;
+      S.coins += reward;
+      addHistory('task', reward, '🎲 Dice Roll ('+finalFace+')');
+      saveState(); updateUI(); confetti();
+      showToast('+'+fmtCoins(reward)+' EV Coins won! 🎉','success');
+      if(window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+      const info = document.getElementById('diceInfoTxt');
+      if(info) info.innerHTML = 'Rolled <b>'+finalFace+'</b> — won <b>'+fmtCoins(reward)+' EV Coins!</b> 🎉';
+      updateDiceUI();
+    }
+  }, 90);
+}
+
+// ════════════════════════════════════
+//  NOTICE BANNER
+// ════════════════════════════════════
+
+function dismissAnnounceBanner() {
+  const banner = document.getElementById('announceBanner');
+  if (banner) banner.style.display = 'none';
+  // No localStorage — banner reappears every session
+}
+
+// ════════════════════════════════════
+//  BOOT
+// ════════════════════════════════════
+updateUI();
+window.addEventListener('load',()=>{ setTimeout(initScratch,100); setTimeout(()=>{ drawSpinWheel(); updateSpinUI(); renderDiceFace(S.lastDiceFace||1); updateDiceUI(); },200); });
+setTimeout(()=>{
+  if(S.lastCaptchaTime>0){
+    const elapsed=(Date.now()-S.lastCaptchaTime)/1000;
+    if(elapsed<CFG.CAPTCHA_COOLDOWN){
+      const left=Math.ceil(CFG.CAPTCHA_COOLDOWN-elapsed);
+      document.getElementById('captchaContainer').innerHTML='<div style="text-align:center;padding:30px 20px;color:var(--muted);font-weight:700;font-size:13px">⏳ Cooldown active...<br><span style="font-size:11px;color:var(--muted)">Complete captcha after timer ends</span></div>';
+      startCaptchaCooldown(left);
+    } else { generateCaptcha(true); }
+  } else { generateCaptcha(true); }
+},150);
+</script>
+</body>
+</html>
